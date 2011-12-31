@@ -1,0 +1,9 @@
+TM_GIT         = "/usr/bin/git"
+
+# special per-filetype rules can be specified like so:
+[ *.{txt,md,mdown,markdown} ]
+spellChecking  = true
+
+[ .git/COMMIT_EDITMSG ]
+spellChecking    = true
+spellingLanguage = 'en'
