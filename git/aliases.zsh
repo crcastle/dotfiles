@@ -13,3 +13,4 @@ alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
 # git svn junk
 alias gsf="git svn fetch"
 alias gsr="git svn rebase"
+alias gsd="git svn dcommit"
