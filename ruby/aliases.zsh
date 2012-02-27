@@ -1,4 +1,4 @@
-alias r='rvm use 1.9.2'
+#alias r='rvm use 1.9.2'
 
 # these are commented out cause i don't use rails
 #alias sc='script/console'

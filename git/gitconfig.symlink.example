@@ -8,10 +8,13 @@
 # install this to the correct location by running the project's main `rake`
 # task.
 [user]
-        name = Zach Holman
-        email = your@example.com
+        name = Chris Castle
+        email = crcastle@gmail.com
+[merge]
+        tool = opendiff
+[push]
+        default = upstream
 [alias]
-        co = checkout
         promote = !$ZSH/bin/git-promote
         wtf     = !$ZSH/bin/git-wtf
         rank-contributers = !$ZSH/bin/git-rank-contributers
@@ -22,10 +25,6 @@
         branch = auto
 [core]
         excludesfile = ~/.gitignore
-        editor = mate -w
-[apply]
-        whitespace = nowarn
+        editor = subl -w
 [github]
-        user = holman
-[mergetool]
-        keepBackup = false
+        user = crcastle
