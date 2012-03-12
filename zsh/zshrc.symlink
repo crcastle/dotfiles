@@ -50,7 +50,7 @@ export EDITOR='subl'
 export PATH="$HOME/bin:$PATH"
 
 # Do vi key bindings on the command line
-bindkey -v
+bindkey -e
 
 # For oh-my-zsh autojump plugin
 if [ -f `brew --prefix`/etc/autojump ]; then
