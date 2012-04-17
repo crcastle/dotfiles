@@ -1,0 +1,3 @@
+# function for creating growl alerts from iTerm2
+# Example:  something_long; growl "all done"
+growl() { echo -e $'\e]9;'${1}'\007' ; return ; }
