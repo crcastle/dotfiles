@@ -1,4 +1,26 @@
-set noswapfile
+" ---------------------------------------------------------------------------
+"  Vundler
+" ---------------------------------------------------------------------------
+set nocompatible
+filetype off  " required!
+
+set rtp+=~/.vim/bundle/vundle/ 
+call vundle#rc()
+
+" Make Vundle keep itself up to date!
+Bundle "gmarik/vundle"
+
+" My bundles
+Bundle "Lokaltog/vim-powerline"
+
+filetype plugin indent on  " discover filetype
+
+set noswapfile             " just save early and often
+
+" ___________________________________________________________________________
+" Powerline config
+" ___________________________________________________________________________
+let g:Powerline_symbols = 'fancy'
 
 " ----------------------------------------------------------------------------
 "  Text Formatting
@@ -16,6 +38,8 @@ set nosmarttab             " fuck tabs
 set formatoptions+=n       " support for numbered/bullet lists
 "set textwidth=80           " wrap at 80 chars by default
 set virtualedit=block      " allow virtual edit in visual block ..
+syntax enable              " pretty colors
+set encoding=utf-8         " cause i'm international and cultured
 
 " ----------------------------------------------------------------------------
 "  Remapping
@@ -60,7 +84,7 @@ set whichwrap+=<,>,h,l,[,] " backspace and cursor keys wrap to
 set shortmess=filtIoOA     " shorten messages
 set report=0               " tell us about changes
 set nostartofline          " don't jump to the start of line when scrolling
-
+set mouse=a                " two finger scrolling in console!
 
 " ----------------------------------------------------------------------------
 " Visual Cues
@@ -71,6 +95,7 @@ set mat=5                  " duration to show matching brace (1/10 sec)
 set incsearch              " do incremental searching
 set laststatus=2           " always show the status line
 set ignorecase             " ignore case when searching
+set smartcase              " ...unless they contain at least one capital letter
 set nohlsearch             " don't highlight searches
 set visualbell             " shut the fuck up
 
