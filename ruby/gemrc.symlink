@@ -1,6 +1,7 @@
 ---
 :update_sources: true
 :sources:
+- http://gemcutter.org
 - http://gems.rubyforge.org/
 - http://gems.github.com
 :verbose: true
