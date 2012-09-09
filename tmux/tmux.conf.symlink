@@ -1,0 +1,36 @@
+set -g default-terminal "screen-256color"
+
+# Enable mouse support in ~/.tmux.conf
+set-option -g mouse-select-pane on
+set-option -g mouse-select-window on
+set-window-option -g mode-mouse on
+
+# Watch background windows for activity
+setw -g monitor-activity on
+
+# Make the active pane more visible
+set -g pane-border-bg default
+set -g pane-border-fg colour245
+set -g pane-active-border-bg default
+set -g pane-active-border-fg green
+
+# Make the active window's name stand out
+setw -g window-status-current-fg brightwhite
+setw -g window-status-current-bg black
+
+# Use color to indicate activity in a background window
+# (Note this is inverted, fg means bg and vice versa.)
+setw -g window-status-activity-fg white
+setw -g window-status-activity-bg brightred
+
+# 0 is too far from ` ;)
+set -g base-index 1
+
+# split
+bind | split-window -h
+bind _ split-window -v
+
+unbind ^T
+bind ^T split-window -p 25
+
+new-session
