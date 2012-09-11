@@ -49,3 +49,6 @@ bindkey '^?' backward-delete-char
 
 # Give me my bash style incremental search
 bindkey '^R' history-incremental-search-backward
+
+# lets files beginning with a . be matched w/o explicitly specifying the dot
+setopt globdots
