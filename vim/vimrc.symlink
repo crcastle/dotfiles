@@ -41,6 +41,13 @@ set virtualedit=block      " allow virtual edit in visual block ..
 syntax enable              " pretty colors
 set encoding=utf-8         " cause i'm international and cultured
 
+" Yank text to the OS X clipboard
+noremap <leader>y "*y
+noremap <leader>yy "*Y
+
+" Preserve indentation while pasting text from the OS X clipboard
+noremap <leader>p :set paste<CR>:put  *<CR>:set nopaste<CR>
+
 " ----------------------------------------------------------------------------
 "  Remapping
 " ----------------------------------------------------------------------------
