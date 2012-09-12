@@ -1,0 +1,22 @@
+#!/bin/zsh
+
+evaluate_ping_speed()
+{
+  ping_result=$(/Users/crcastle/.dotfiles/bin/internet)
+  if [[ "$ping_result" =~ 'down' ]]; then
+    echo "red"
+  elif [[ "$ping_result" =~ 'slow' ]]; then
+    echo "yellow"
+  elif [[ "$ping_result" =~ ' up ' ]]; then
+    echo "green"
+  else
+    echo "black"
+  fi
+}
+
+format_for_tmux()
+{
+  echo "#[bg=$1]  #[default]"
+}
+
+format_for_tmux $(evaluate_ping_speed)
