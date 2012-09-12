@@ -25,6 +25,6 @@
         branch = auto
 [core]
         excludesfile = ~/.gitignore
-        editor = subl -w
+        editor = vi
 [github]
         user = crcastle
