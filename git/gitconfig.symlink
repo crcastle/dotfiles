@@ -19,6 +19,9 @@
         wtf     = !$ZSH/bin/git-wtf
         rank-contributers = !$ZSH/bin/git-rank-contributers
         count   = !git shortlog -sn
+	prom = pull --rebase origin master
+	pr = pull --rebase
+	undo = reset --soft HEAD^
 [color]
         diff = auto
         status = auto
@@ -28,3 +31,5 @@
         editor = vi
 [github]
         user = crcastle
+[branch]
+	autosetuprebase = always
