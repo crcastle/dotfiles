@@ -1,5 +1,5 @@
 set -g default-terminal "screen-256color"
-set -g default-command "/usr/local/bin/reattach-to-user-namespace -l zsh"
+set-option -g default-command "/usr/local/bin/reattach-to-user-namespace -l zsh"
 
 # remap prefix to Control + a
 set -g prefix C-a
@@ -52,7 +52,7 @@ unbind p
 bind p paste-buffer
 bind-key -t vi-copy 'v' begin-selection
 bind-key -t vi-copy 'y' copy-selection
-bind y run "tmux save-buffer - | /usr/local/bin/reattach-to-user-namespace pbcopy"
+bind y run "tmux save-buffer - | /usr/local/bin/reattach-to-user-namespace /usr/bin/pbcopy"
 
 # Rather than constraining window size to the maximum size of any client
 # connected to the *session*, constrain window size to the maximum size of any
