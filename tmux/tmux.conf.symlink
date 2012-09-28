@@ -52,7 +52,8 @@ unbind p
 bind p paste-buffer
 bind-key -t vi-copy 'v' begin-selection
 bind-key -t vi-copy 'y' copy-selection
-bind y run "tmux save-buffer - | /usr/local/bin/reattach-to-user-namespace /usr/bin/pbcopy"
+#bind y run "tmux show-buffer - | /usr/local/bin/reattach-to-user-namespace /usr/bin/pbcopy"
+bind y run "/usr/local/bin/reattach-to-user-namespace -l zsh -c 'tmux show-buffer | pbcopy'"
 
 # Rather than constraining window size to the maximum size of any client
 # connected to the *session*, constrain window size to the maximum size of any
