@@ -28,7 +28,7 @@
         branch = auto
 [core]
         excludesfile = ~/.gitignore
-        editor = vi
+        editor = /usr/bin/vim
 [github]
         user = crcastle
 [branch]
