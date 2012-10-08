@@ -33,3 +33,5 @@
         user = crcastle
 [branch]
 	autosetuprebase = always
+[diff]
+	external = /Users/crcastle/.dotfiles/bin/git-diff-cmd.sh
