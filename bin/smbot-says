@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Make chatroom bot say stuff in the company Hangout chat room
+
+curl "http://$SMBOT_SERVER/hubot/send/smyo/$SMBOT_ROOM/$(echo "$*\c" | xxd -plain | tr -d '\n' | sed 's/\(..\)/%\1/g')"
+
