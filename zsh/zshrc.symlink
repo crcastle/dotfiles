@@ -61,6 +61,10 @@ fi
 # For some reason, history-substring-search doesn't load as a plugin
 source ~/.oh-my-zsh/plugins/history-substring-search/history-substring-search.zsh
 
+# Fix borked arrow keys for history-substring-search after Nov or Dec 2012 upgrade of oh-my-zsh
+bindkey '\eOA' history-substring-search-up
+bindkey '\eOB' history-substring-search-down
+
 alias more less
 
 
