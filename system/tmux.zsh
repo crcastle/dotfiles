@@ -28,6 +28,6 @@ on_exit() {
 ssh() {
   settitle $(echo $* | sed "s/.*@//" | sed "s/ .*//")
   set_bg "/Users/crcastle/Dropbox/Photos/Wallpapers/bear.png"
-  trap on_exit EXIT
+  trap on_exit INT
   command ssh "$@"
 }
