@@ -8,8 +8,8 @@
 # install this to the correct location by running the project's main `rake`
 # task.
 [user]
-        name = Chris Castle
-        email = crcastle@gmail.com
+	name = Chris Castle
+	email = crcastle@gmail.com
 [merge]
         tool = opendiff
 [push]
@@ -27,7 +27,7 @@
         status = auto
         branch = auto
 [core]
-        excludesfile = ~/.gitignore
+	excludesfile = /Users/crcastle/.gitignore
         editor = /usr/bin/vim
 [github]
         user = crcastle
@@ -35,3 +35,9 @@
 	autosetuprebase = always
 [diff]
 	external = /Users/crcastle/.dotfiles/bin/git-diff-cmd.sh
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
