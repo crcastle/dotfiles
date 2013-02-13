@@ -9,7 +9,7 @@ evaluate_ping_speed()
     if (( internal_ping_ms == 0)); then
       echo "The wireless is down (router not responding to ping)"
     elif (( internal_ping_ms < 20 )); then
-      echo "The wireless is working, but the external connection is down (<20ms ping to router, no ping to google)"
+      echo "The wireless is working, but the external connection is down (<20ms ping to router, no ping to $1)"
     elif (( internal_ping_ms < 1000 )); then
       echo "The wireless is slow, and the external connection is down (>20ms but <1000ms ping to router)"
     elif (( internal_ping_ms >= 1000 )); then
@@ -18,11 +18,11 @@ evaluate_ping_speed()
       echo "No idea what's going on with the wireless, but the external connection is down"
     fi
   elif (( ping_ms < 50 )); then
-    echo "The internet is up (<50ms ping to google)"
+    echo "The internet is up (<50ms ping to $1)"
   elif (( ping_ms < 200 )); then
-    echo "The internet is up, but slower than normal (>50ms but <200ms ping to google)"
+    echo "The internet is up, but slower than normal (>50ms but <200ms ping to $1)"
   elif (( ping_ms >= 200 )); then
-    echo "The internet is really slow (>200ms ping to google)"
+    echo "The internet is really slow (>200ms ping to $1)"
   else
     echo "No idea what's going on with the internet (tell chris i'm broken)"
   fi
@@ -32,4 +32,4 @@ avg_ping() {
   echo $(ping -n -c 4 -W 1000 $1 | tail -1| awk '{print $4}' | cut -d '/' -f 2)
 }
 
-evaluate_ping_speed 8.8.8.8
+evaluate_ping_speed $1

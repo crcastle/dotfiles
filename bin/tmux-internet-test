@@ -2,7 +2,7 @@
 
 evaluate_ping_speed()
 {
-  ping_result=$(/Users/crcastle/.dotfiles/bin/internet)
+  ping_result=$(/Users/crcastle/.dotfiles/bin/internet $1)
   if [[ "$ping_result" =~ 'down' ]]; then
     echo "red"
   elif [[ "$ping_result" =~ 'slow' ]]; then
@@ -19,4 +19,4 @@ format_for_tmux()
   echo "#[bg=$1]  #[default]"
 }
 
-format_for_tmux $(evaluate_ping_speed)
+format_for_tmux $(evaluate_ping_speed $1)
