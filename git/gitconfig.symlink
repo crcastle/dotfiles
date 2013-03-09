@@ -31,6 +31,7 @@
         editor = /usr/bin/vim
 [github]
         user = crcastle
+        pass = !security find-internet-password -a crcastle -s github.com -w
 [branch]
 	autosetuprebase = always
 [diff]
