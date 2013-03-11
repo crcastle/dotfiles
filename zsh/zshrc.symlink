@@ -130,3 +130,5 @@ EOBUNDLES
 antigen-bundle zsh-users/zsh-syntax-highlighting
 antigen-apply
 
+COWFILE=$(files=(/usr/local/Cellar/cowsay/3.03/share/cows/*); echo $files[$RANDOM%$#files])
+fortune -s | cowsay -f $COWFILE | lolcat
