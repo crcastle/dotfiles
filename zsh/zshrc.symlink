@@ -109,6 +109,7 @@ command-not-found
 
 ruby
 brew
+bundler
 github
 cloudapp
 pip
