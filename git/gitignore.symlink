@@ -6,3 +6,4 @@
 *.rbc
 vendor
 .bundle
+bin
