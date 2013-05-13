@@ -1,11 +1,19 @@
-#!/bin/zsh
+# Antigen: A simple plugin manager for zsh
+# Authors: Shrikant Sharat Kandula
+#          and Contributors <https://github.com/zsh-users/antigen/contributors>
+# Homepage: http://antigen.sharats.me
+# License: MIT License <mitl.sharats.me>
 
 # Each line in this string has the following entries separated by a space
 # character.
 # <repo-url>, <plugin-location>, <bundle-type>, <has-local-clone>
 # FIXME: Is not kept local by zsh!
 local _ANTIGEN_BUNDLE_RECORD=""
-local _ANTIGEN_INSTALL_DIR="$(dirname $0)"
+local _ANTIGEN_INSTALL_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Used to defer compinit/compdef
+typeset -a __deferred_compdefs
+compdef () { __deferred_compdefs=($__deferred_compdefs "$*") }
 
 # Syntaxes
 #   antigen-bundle <url> [<loc>=/]
@@ -94,7 +102,7 @@ antigen-bundles () {
 
     local line
 
-    grep -v '^\s*$\|^#' | while read line; do
+    grep '^[[:space:]]*[^[:space:]#]' | while read line; do
         # Using `eval` so that we can use the shell-style quoting in each line
         # piped to `antigen-bundles`.
         eval "antigen-bundle $line"
@@ -126,18 +134,22 @@ antigen-update () {
 }
 
 antigen-revert () {
-    if ! [[ -f $ADOTDIR/revert-info ]]; then
+    if [[ -f $ADOTDIR/revert-info ]]; then
+        cat $ADOTDIR/revert-info | sed '1!p' | while read line; do
+            dir="$(echo "$line" | cut -d: -f1)"
+            git --git-dir="$dir/.git" --work-tree="$dir" \
+                checkout "$(echo "$line" | cut -d: -f2)" 2> /dev/null
+
+        done
+
+        echo "Reverted to state before running -update on $(
+                cat $ADOTDIR/revert-info | sed -n 1p)."
+
+    else 
         echo 'No revert information available. Cannot revert.' >&2
     fi
 
-    cat $ADOTDIR/revert-info | sed '1!p' | while read line; do
-        dir="$(echo "$line" | cut -d: -f1)"
-        git --git-dir="$dir/.git" --work-tree="$dir" \
-            checkout "$(echo "$line" | cut -d: -f2)" 2> /dev/null
-    done
 
-    echo "Reverted to state before running -update on $(
-            cat $ADOTDIR/revert-info | sed -n 1p)."
 }
 
 -antigen-get-clone-dir () {
@@ -218,14 +230,14 @@ antigen-revert () {
 
     # If its a specific branch that we want, checkout that branch.
     if [[ $url == *\|* ]]; then
-        local antigen_current_branch=${$(--plugin-git symbolic-ref HEAD)##refs/heads/}
+        local current_branch=${$(--plugin-git symbolic-ref HEAD)##refs/heads/}
         local requested_branch="${url#*|}"
         # Only do the checkout when we are not already on the branch.
-        [[ $requested_branch != $antigen_current_branch ]] &&
+        [[ $requested_branch != $current_branch ]] &&
             --plugin-git checkout $requested_branch
     fi
 
-    if ! [[ -z $old_rev || $old_rev == $new_rev ]]; then
+    if [[ -n $old_rev && $old_rev != $new_rev ]]; then
         echo Updated from ${old_rev:0:7} to ${new_rev:0:7}.
         if $verbose; then
             --plugin-git log --oneline --reverse --no-merges --stat '@{1}..'
@@ -263,7 +275,7 @@ antigen-revert () {
         # Source the plugin script.
         # FIXME: I don't know. Looks very very ugly. Needs a better
         # implementation once tests are ready.
-        local script_loc="$(ls "$location" | grep -m1 '\.plugin\.zsh$')"
+        local script_loc="$(ls "$location" | grep '\.plugin\.zsh$' | head -n1)"
 
         if [[ -f $location/$script_loc ]]; then
             # If we have a `*.plugin.zsh`, source it.
@@ -280,12 +292,12 @@ antigen-revert () {
                 source "$location/init.zsh"
             fi
 
-        elif ls "$location" | grep -qm1 '\.zsh$'; then
+        elif ls "$location" | grep -l '\.zsh$' &> /dev/null; then
             # If there is no `*.plugin.zsh` file, source *all* the `*.zsh`
             # files.
             for script ($location/*.zsh(N)) source "$script"
 
-        elif ls "$location" | grep -qm1 '\.sh$'; then
+        elif ls "$location" | grep -l '\.sh$' &> /dev/null; then
             # If there are no `*.zsh` files either, we look for and source any
             # `*.sh` files instead.
             for script ($location/*.sh(N)) source "$script"
@@ -363,16 +375,44 @@ antigen-cleanup () {
     fi
 }
 
-antigen-lib () {
+antigen-use () {
+    if [[ $1 == oh-my-zsh ]]; then
+        -antigen-use-oh-my-zsh
+    elif [[ $1 == prezto ]]; then
+        -antigen-use-prezto
+    else
+        echo 'Usage: antigen-use <library-name>' >&2
+        echo 'Where <library-name> is any one of the following:' >&2
+        echo ' * oh-my-zsh' >&2
+        echo ' * prezto' >&2
+        return 1
+    fi
+}
+
+-antigen-use-oh-my-zsh () {
     if [[ -z "$ZSH" ]]; then
         export ZSH="$(-antigen-get-clone-dir "$ANTIGEN_DEFAULT_REPO_URL")"
     fi
     antigen-bundle --loc=lib
 }
 
-antigen-prezto-lib () {
+-antigen-use-prezto () {
     antigen-bundle sorin-ionescu/prezto
     export ZDOTDIR=$ADOTDIR/repos/
+}
+
+# For backwards compatibility.
+antigen-lib () {
+    -antigen-use-oh-my-zsh
+    echo '`antigen-lib` is deprecated and will soon be removed.'
+    echo 'Use `antigen-use oh-my-zsh` instead.'
+}
+
+# For backwards compatibility.
+antigen-prezto-lib () {
+    -antigen-use-prezto
+    echo '`antigen-prezto-lib` is deprecated and will soon be removed.'
+    echo 'Use `antigen-use prezto` instead.'
 }
 
 antigen-theme () {
@@ -391,10 +431,22 @@ antigen-theme () {
 }
 
 antigen-apply () {
+
     # Initialize completion.
-    # TODO: Only load completions if there are any changes to the bundle
-    # repositories.
+    local cdef
+
+    # Load the compinit module. This will readefine the `compdef` function to
+    # the one that actually initializes completions.
+    autoload -U compinit
     compinit -i
+
+    # Apply all `compinit`s that have been deferred.
+    eval "$(for cdef in $__deferred_compdefs; do
+                echo compdef $cdef
+            done)"
+
+    unset __deferred_compdefs
+
 }
 
 antigen-list () {
@@ -493,8 +545,17 @@ EOF
 # function, you can write `antigen-bundle` as `antigen bundle` and so on.
 antigen () {
     local cmd="$1"
+    if [[ -z "$cmd" ]]; then
+        echo 'Antigen: Please give a command to run.' >&2
+        return 1
+    fi
     shift
-    "antigen-$cmd" "$@"
+
+    if functions "antigen-$cmd" > /dev/null; then
+        "antigen-$cmd" "$@"
+    else
+        echo "Antigen: Unknown command: $cmd" >&2
+    fi
 }
 
 -antigen-parse-args () {
@@ -541,7 +602,7 @@ antigen () {
 
     # Set spec values based on the positional arguments.
     local i=1
-    while ! [[ -z $1 || $1 == --* ]]; do
+    while [[ -n $1 && $1 != --* ]]; do
 
         if (( $i > $positional_args_count )); then
             echo "Only $positional_args_count positional arguments allowed." >&2
@@ -553,7 +614,7 @@ antigen () {
         local name="${${name_spec%\?}%:}"
         local value="$1"
 
-        if echo "$code" | grep -qm1 "^local $name="; then
+        if echo "$code" | grep -l "^local $name=" &> /dev/null; then
             echo "Argument '$name' repeated with the value '$value'". >&2
             return
         fi
@@ -595,13 +656,14 @@ antigen () {
             local value="${arg#*=}"
         fi
 
-        if echo "$code" | grep -qm1 "^local $name="; then
+        if echo "$code" | grep -l "^local $name=" &> /dev/null; then
             echo "Argument '$name' repeated with the value '$value'". >&2
             return
         fi
 
         # The specification for this argument, used for validations.
-        local arg_line="$(echo "$keyword_args" | grep -m1 "^$name:\??\?")"
+        local arg_line="$(echo "$keyword_args" |
+                            egrep "^$name:?\??" | head -n1)"
 
         # Validate argument and value.
         if [[ -z $arg_line ]]; then
@@ -609,12 +671,14 @@ antigen () {
             echo "Unknown argument '$name'." >&2
             return
 
-        elif (echo "$arg_line" | grep -qm1 ':') && [[ -z $value ]]; then
+        elif (echo "$arg_line" | grep -l ':' &> /dev/null) &&
+                [[ -z $value ]]; then
             # This argument needs a value, but is not provided.
             echo "Required argument for '$name' not provided." >&2
             return
 
-        elif (echo "$arg_line" | grep -vqm1 ':') && [[ ! -z $value ]]; then
+        elif (echo "$arg_line" | grep -vl ':' &> /dev/null) &&
+                [[ -n $value ]]; then
             # This argument doesn't need a value, but is provided.
             echo "No argument required for '$name', but provided '$value'." >&2
             return
@@ -656,11 +720,6 @@ antigen () {
         https://github.com/robbyrussell/oh-my-zsh.git
     -set-default ADOTDIR $HOME/.antigen
 
-    # Load the compinit module. Required for `compdef` to be defined, which is
-    # used by many plugins to define completions.
-    autoload -U compinit
-    compinit -i
-
     # Setup antigen's own completion.
     compdef _antigen antigen
 
@@ -677,10 +736,12 @@ _antigen () {
         revert     \
         list       \
         cleanup    \
-        lib        \
+        use        \
         selfupdate \
         theme      \
         apply      \
+        snapshot   \
+        restore    \
         help
 }
 
