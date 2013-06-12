@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+/usr/local/bin/encfs --extpass="$DOT/bin/get-keychain-pw 'Encrypted Folder'" $HOME/Dropbox/.encrypted $HOME/Dropbox\ Encrypted

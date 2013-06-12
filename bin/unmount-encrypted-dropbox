@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+/sbin/umount "$HOME/Dropbox Encrypted"
