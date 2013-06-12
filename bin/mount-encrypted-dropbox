@@ -2,4 +2,4 @@
 #
 # You need encfs to use this. Install with `brew install encfs`
 
-/usr/local/bin/encfs --extpass="$DOT/bin/get-keychain-pw 'Encrypted Folder'" $HOME/Dropbox/.encrypted $HOME/Dropbox\ Encrypted
+/usr/local/bin/encfs --extpass="$DOT/bin/get-keychain-pw 'Encrypted Folder'" $HOME/Dropbox/.encrypted $HOME/Dropbox\ Encrypted -- -ovolname="Dropbox Encrypted" -ovolicon=$DOT/bin/Dropbox.icns
