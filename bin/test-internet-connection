@@ -7,7 +7,7 @@
 require 'open-uri'
 
 begin
-  exit if open('http://www.google.com/')
+  exit if open('http://www.apple.com/')
 rescue
   exit(1)
 end
