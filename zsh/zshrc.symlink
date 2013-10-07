@@ -59,13 +59,6 @@ if [ -f `brew --prefix`/etc/autojump ]; then
   . `brew --prefix`/etc/autojump
 fi
 
-# For some reason, history-substring-search doesn't load as a plugin
-source ~/.oh-my-zsh/plugins/history-substring-search/history-substring-search.zsh
-
-# Fix borked arrow keys for history-substring-search after Nov or Dec 2012 upgrade of oh-my-zsh
-bindkey '\eOA' history-substring-search-up
-bindkey '\eOB' history-substring-search-down
-
 alias more less
 
 
@@ -105,7 +98,16 @@ export PATH="/usr/local/heroku/bin:$PATH"
 # Install plugins with Antigen
 
 source $HOME/.dotfiles/zsh/antigen.zsh
-antigen-bundles <<EOBUNDLES
+
+# zsh-syntax-highlighting needs to be explicitly loaded prior to zsh-history-substring-search
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-history-substring-search
+
+# bind UP and DOWN arrow keys
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+antigen bundles <<EOBUNDLES
 
 # Guess what to install when running an unknown command.
 command-not-found
@@ -119,7 +121,6 @@ python
 npm
 node
 gem
-history-substring-search
 osx
 rbenv
 ssh-agent
@@ -130,7 +131,6 @@ extract
 
 EOBUNDLES
 
-antigen-bundle zsh-users/zsh-syntax-highlighting
 antigen-apply
 
 COWFILE=$(files=(/usr/local/Cellar/cowsay/3.03/share/cows/*); echo $files[$RANDOM%$#files])
