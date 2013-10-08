@@ -126,6 +126,7 @@ rails
 pow
 extract
 zsh-users/zsh-completions src
+kennethreitz/autoenv
 
 EOBUNDLES
 
