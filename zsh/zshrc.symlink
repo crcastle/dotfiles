@@ -125,6 +125,7 @@ vi-mode
 rails
 pow
 extract
+zsh-users/zsh-completions src
 
 EOBUNDLES
 
