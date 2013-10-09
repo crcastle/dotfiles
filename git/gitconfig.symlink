@@ -51,3 +51,10 @@
 	prompt = false
 [merge]
 	tool = Kaleidoscope
+[git-up "fetch"]
+	prune = true
+[git-up "rebase"]
+	log-hook = "echo \"changes on $1:\"; git log --oneline --decorate $1..$2"
+	arguments = --preserve-merges
+[git-up "bundler"]
+	check = true
