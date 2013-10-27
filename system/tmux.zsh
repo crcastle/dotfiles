@@ -27,7 +27,11 @@ on_exit() {
 
 ssh() {
   settitle $(echo $* | sed "s/.*@//" | sed "s/ .*//")
-  set_bg "/Users/crcastle/Dropbox/Photos/Wallpapers/bear.png"
+  if [ $(echo $* | grep "prod.chi.intsm.net") ]; then
+    set_bg "/Users/crcastle/Dropbox/Photos/Wallpapers/bear.png"
+  else
+    set_bg "/Users/crcastle/Dropbox/Photos/Wallpapers/Paradox.png"
+  fi
   trap on_exit INT
   trap on_exit EXIT
   command ssh "$@"
