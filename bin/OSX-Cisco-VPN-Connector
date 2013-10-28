@@ -1,0 +1,139 @@
+/usr/bin/osascript - <<-SCRIPTYO
+
+(*
+This script will use the OSX Cisco VPN client to connect to a VPN getting the VPN password from one of you OSX Keychains.
+If the VPN connection is already active, this script will disconnect you from the VPN.
+
+There are a few things that must be configured before you can use this.
+
+Requirements:
+* Set up a Cisco VPN service in Network Preferences
+* Save the password for the VPN in a keychain in OSX Keychain Access app. I strongly recommend you create this password in a *new* keychain in the Keychain Access app. To do that...
+  - Open Keychain Access app
+  - File -> New Keychain
+  - Save in ~/Library/Keychains  (this is the default keychain storage location)
+  - Set the keychain password with a strong password (I used the same password as my OSX user account)
+  - Right-click on the keychain you just created in the keychains list in the top left
+  - Select "Change Settings for Keychain "your-new-keychain""
+  - Check both checkboxes
+  - Set the keychain to lock after 1 minute of inactivity
+  - Now create a keychain item
+  - Give it a Keychain Item Name, Account Name (doesn't matter what this is), and your VPN password
+* Save configuration values in the OSX defaults system
+  - They are saved in com.llama-enterprises.osx-cisco-vpn-connector
+  - The two configuration items are keychainItemName and VPNServiceName
+  - From the command line run the following command replacing the two capitalized phrases in quotes with the correct values you created in the above steps
+  defaults write com.llama-enterprises.osx-cisco-vpn-connector keychainItemName "KEYCHAIN ITEM NAME"; defaults write com.llama-enterprises.osx-cisco-vpn-connector VPNServiceName "VPN SERVICE NAME"
+
+Ways to use this script:
+* Run from the command line: ./OSX-Cisco-VPN-Connector
+* Run as an Alfred Workflow: copy all the AppleScript code (everything except the first and last lines of this file) to a "Run NSAppleScript" action in Alfred
+* Run from Quicksilver (not tested)
+* Put on your Desktop and double-click
+
+Other important notes:
+* OSX 10.9 Mavericks users: The first time you run this you'll probably get an error saying you need to give this application (or Terminal.app or iTerm.app)
+    permissions to use Assistive Access.  Follow the instructions to give the app the proper permissions.
+*)
+
+-- subroutine to return password for keychainItemName or trigger error
+on getPW(keychainItemName)
+    try
+        set result to do shell script "security 2>&1 find-generic-password -gwl " & quoted form of keychainItemName
+    on error the error_message number the error_number
+        if error_number = 44 then
+            error "Keychain item \"" & keychainItemName & "\" could not be found in any keychain."
+        else if error_number = 128 then
+            error "Incorrect keychain password."
+        else
+            error "Unknown error getting VPN password from keychain."
+        end if
+    end try
+
+    return result
+end getPW
+
+-- subroutine to display an alert for errors
+on err(primaryText, secondaryText)
+    display alert primaryText message secondaryText buttons {"Cancel"} default button 1 as critical
+end err
+
+-- subroutine to display instructions to the user
+on user_instructions(primaryText, copyText)
+    set theResponse to display dialog primaryText default answer copyText buttons {"Cancel"} default button 1 with icon stop
+end user_instructions
+
+--
+-- Now the "main" program
+--
+
+-- get config values from OSX defaults system
+-- if error, prompt user to define the necessary defaults values using command line
+try
+    set keychainItemName to do shell script "defaults read com.llama-enterprises.osx-cisco-vpn-connector keychainItemName"
+    set VPNServiceName to do shell script "defaults read com.llama-enterprises.osx-cisco-vpn-connector VPNServiceName"
+on error the error_message number the error_number
+    set theResponse to user_instructions("Configuration values not set up. Copy and paste this to your terminal and replace the two capitalized phrases in quotes with valid values. Then hit enter.", "defaults write com.llama-enterprises.osx-cisco-vpn-connector keychainItemName \"KEYCHAIN ITEM NAME\"; defaults write com.llama-enterprises.osx-cisco-vpn-connector VPNServiceName \"VPN SERVICE NAME\"")
+    error "Configuration values not set up" number 503
+end try
+
+tell application "System Events"
+    tell current location of network preferences
+        set VPNService to service (my VPNServiceName)
+        if exists VPNService then
+            set isConnected to connected of current configuration of VPNService
+            if isConnected then
+                disconnect VPNService
+                return (my VPNServiceName) & " VPN disconnected!"
+            else
+                connect VPNService
+
+                tell application "System Events"
+                    set maxTries to 5
+                    set tries to 0
+
+                    -- Sometimes the VPN password prompt takes a while to show up
+                    -- This can be caused by slow internet or some problem contacting the VPN server
+                    -- Wait about 10 seconds and then give up with an error message
+                    repeat
+                        if tries > maxTries then
+                            my err("No VPN password prompt after 10 seconds.", "Check your internet connection and try again.")
+                            error "No VPN password prompt after 10 seconds.  Check your internet connection and try again." number 502
+                        end if
+                        if exists process "UserNotificationCenter" then
+                            if windows of process "UserNotificationCenter" is not {} then
+                                exit repeat
+                            end if
+                        end if
+                        set tries to tries + 1
+                        delay 2
+                    end repeat
+
+                    -- Get VPN password from an OSX Keychain
+                    try
+                        set thePassword to my getPW(my keychainItemName)
+                    on error the error_message number the error_number
+                        my err(error_message,"")
+                        try
+                            click button "Cancel" of window 1 of process "UserNotificationCenter"
+                        end try
+                        error "VPN not connected. Could not get password from keychain." number 501
+                    end try
+
+                    -- Got password.  Fill it in and hit OK
+                    tell process "UserNotificationCenter"
+                        set frontmost to true
+                        set theDescription to description of text field 2 of window 1
+                        if theDescription = "secure text field" then
+                            set value of text field 2 of window 1 to thePassword
+                            click button "OK" of window 1
+                        end if
+                    end tell
+                end tell
+                return (my VPNServiceName) & " VPN connected!"
+            end if
+        end if
+    end tell
+end tell
+
+SCRIPTYO
