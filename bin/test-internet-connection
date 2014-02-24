@@ -7,7 +7,9 @@
 require 'open-uri'
 
 begin
-  exit if open('http://www.apple.com/')
+  exit if open('http://www.apple.com/library/test/success.html', :redirect => false)
 rescue
   exit(1)
 end
+
+exit(1)
