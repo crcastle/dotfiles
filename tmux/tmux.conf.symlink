@@ -1,5 +1,5 @@
 set -g default-terminal "screen-256color"
-set-option -g default-command "/usr/local/bin/reattach-to-user-namespace -l zsh"
+set-option -g default-command "/bin/bash -c 'which reattach-to-user-namespace >/dev/null && exec reattach-to-user-namespace $SHELL -l || exec $SHELL -l'"
 
 # remap prefix to Control + a
 set -g prefix C-a
@@ -19,23 +19,12 @@ set-option -g mouse-select-pane on
 set-option -g mouse-select-window on
 set-window-option -g mode-mouse on
 
+# Set scroll history to something bigger than the default
+set-option -g history-limit 5000
+
 # Watch background windows for activity
 setw -g monitor-activity on
-
-# Make the active pane more visible
-set -g pane-border-bg default
-set -g pane-border-fg colour245
-set -g pane-active-border-bg default
-set -g pane-active-border-fg green
-
-# Make the active window's name stand out
-setw -g window-status-current-fg brightwhite
-setw -g window-status-current-bg black
-
-# Use color to indicate activity in a background window
-# (Note this is inverted, fg means bg and vice versa.)
-setw -g window-status-activity-fg white
-setw -g window-status-activity-bg brightred
+set -g visual-activity on
 
 # 0 is too far from ` ;)
 set -g base-index 1
@@ -47,18 +36,24 @@ bind _ split-window -v
 unbind ^T
 bind ^T split-window -p 25
 
+# Be like vi
+bind-key : command-prompt
+setw -g mode-keys vi
+
 # copy/paste junk
 unbind p
 bind p paste-buffer
-bind-key -t vi-copy 'v' begin-selection
-bind-key -t vi-copy 'y' copy-selection
+bind-key -t vi-copy v begin-selection
+bind-key -t vi-copy y copy-pipe "/usr/local/bin/reattach-to-user-namespace /usr/bin/pbcopy"
+unbind -t vi-copy Enter
+bind-key -t vi-copy Enter copy-pipe "/usr/local/bin/reattach-to-user-namespace /usr/bin/pbcopy"
 #bind y run "tmux show-buffer - | /usr/local/bin/reattach-to-user-namespace /usr/bin/pbcopy"
-bind y run "/usr/local/bin/reattach-to-user-namespace -l zsh -c 'tmux show-buffer | pbcopy'"
+#bind y run "/usr/local/bin/reattach-to-user-namespace -l zsh -c 'tmux show-buffer | pbcopy'"
 
 # Rather than constraining window size to the maximum size of any client
 # connected to the *session*, constrain window size to the maximum size of any
 # client connected to *that window*. Much more reasonable.
-setw -g aggressive-resize on
+#setw -g aggressive-resize on
 
 # turn off auto window rename, so the names I set stay put
 set-window-option -g automatic-rename off
@@ -76,6 +71,39 @@ set -g message-attr bold
 set -g status-left '#[fg=colour235,bg=colour252,bold] ❐ #S #[fg=colour252,bg=colour238,nobold]#[fg=colour245,bg=colour238,bold] #(whoami)#[fg=colour232,bg=colour234,nobold]'
 set -g window-status-format "#[fg=white,bg=colour234] #I #W "
 set -g window-status-current-format "#[fg=colour234,bg=colour39]#[fg=colour25,bg=colour39,noreverse,bold] #I  #W #[fg=colour39,bg=colour234,nobold]"
+
+# Make the active pane more visible
+set -g pane-border-bg default
+set -g pane-border-fg colour245
+set -g pane-active-border-bg default
+set -g pane-active-border-fg green
+
+# Make the active window's name stand out
+setw -g window-status-current-fg brightwhite
+setw -g window-status-current-bg black
+
+# Use color to indicate activity in a background window
+# (Note this is inverted, fg means bg and vice versa.)
+# I don't think these are doing anything...
+setw -g window-status-activity-fg white
+setw -g window-status-activity-bg brightred
+
+# # Status Bar
+# set-option -g status-interval 1
+# set-option -g status-left ''
+# set-option -g status-right '%l:%M%p'
+# set-window-option -g window-status-current-fg magenta
+# set-option -g status-fg default
+
+# # Status Bar solarized-dark (default)
+# set-option -g status-bg black
+# set-option -g pane-active-border-fg black
+# set-option -g pane-border-fg black
+
+# Status Bar solarized-light
+# set-option -g status-bg white
+# set-option -g pane-active-border-fg white
+# set-option -g pane-border-fg white
 
 # Show internet status on right side
 set -g status-right "#(/Users/crcastle/.dotfiles/bin/tmux-internet-test 10.100.1.149)#(/Users/crcastle/.dotfiles/bin/tmux-internet-test 8.8.8.8) "
