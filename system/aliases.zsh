@@ -9,3 +9,4 @@ then
   alias la='gls -A --color'
 fi
 
+alias lastd='echo ~/Downloads/$(ls -t ~/Downloads/ | head -n 1)'
