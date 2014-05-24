@@ -1,0 +1,7 @@
+function remote_volume
+{
+    local user="$1"
+    local host="$2"
+    local vol="$3"
+    ssh "$user"@"$host" 'osascript -e "set volume output volume '"$vol"'"'
+}
