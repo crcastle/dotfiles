@@ -58,3 +58,5 @@
 	arguments = --preserve-merges
 [git-up "bundler"]
 	check = true
+[url "git@github.com:"]
+    insteadOf = https://github.com/
