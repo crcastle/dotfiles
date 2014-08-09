@@ -20,7 +20,7 @@ set-option -g mouse-select-window on
 set-window-option -g mode-mouse on
 
 # Set scroll history to something bigger than the default
-set-option -g history-limit 5000
+set-option -g history-limit 50000
 
 # Watch background windows for activity
 setw -g monitor-activity on
