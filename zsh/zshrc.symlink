@@ -121,7 +121,6 @@ gem
 osx
 rbenv
 ssh-agent
-vi-mode
 rails
 pow
 extract
