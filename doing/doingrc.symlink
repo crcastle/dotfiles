@@ -50,6 +50,13 @@ views:
     section: Todo
     count: 10
     order: asc
+  last_wwid:
+    date_format: '%Y-%m-%d %H:%M'
+    template: '%date | %title%note'
+    wrap_width: 0
+    count: 1
+    order: asc
+    section: Currently
 marker_tag: flagged
 marker_color: red
 :include_notes: true
