@@ -29,7 +29,7 @@ evaluate_ping_speed()
 }
 
 avg_ping() {
-  echo $(ping -n -c 4 -W 1000 -i 0.1 $1 | tail -1| awk '{print $4}' | cut -d '/' -f 2)
+  echo $(ping -n -c 10 -W 1000 -i 0.1 $1 | tail -1| awk '{print $4}' | cut -d '/' -f 2)
 }
 
 evaluate_ping_speed $1
